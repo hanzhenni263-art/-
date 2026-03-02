@@ -662,7 +662,7 @@
 </div>
 
 <script>
-  // 确保函数在最外层，按钮才找得到
+  // 核心播放函数
   function openModal(videoSrc) {
     const modal = document.getElementById('videoModal');
     const video = document.getElementById('modalVideo');
@@ -670,17 +670,20 @@
     if (modal && video) {
       video.src = videoSrc;
       modal.classList.remove('hidden');
+      // 解决你说的“看完视频滑不动”的问题
+      document.body.style.overflow = 'hidden'; 
       
-      // --- 关键修复：打开时禁止背景滚动 ---
-      document.body.style.overflow = 'hidden';
-      // -------------------------------
-
       setTimeout(() => {
         modal.classList.add('opacity-100');
       }, 20);
-      video.play();
+      
+      // 强制手机端触发播放
+      video.play().catch(err => console.log("手机端自动播放受阻"));
     }
   }
+
+  // 重要：把 openVideo 也指向同一个功能，解决你作品卡片点不开的问题
+  window.openVideo = openModal;
 
   function closeModal() {
     const modal = document.getElementById('videoModal');
@@ -688,24 +691,30 @@
     
     if (modal && video) {
       modal.classList.remove('opacity-100');
-      
-      // --- 关键修复：恢复滚动 ---
+      // 恢复滚动
       document.body.style.overflow = ''; 
-      // -----------------------
-
+      
       setTimeout(() => {
         modal.classList.add('hidden');
         video.pause();
         video.currentTime = 0;
-        video.src = ""; 
+        video.src = ""; // 释放手机带宽
       }, 300);
     }
   }
 
-  // 点击背景也能关
+  // 点击黑色背景关闭
   document.getElementById('videoModal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
   });
+
+  // 手机端“踢一脚”：用户第一次触摸屏幕时，强制唤醒 Hero 背景视频
+  document.addEventListener('touchstart', function() {
+    const hero = document.getElementById('hero-video');
+    if (hero && hero.paused) {
+      hero.play();
+    }
+  }, { once: true });
 </script>
 </body>
 </html>
