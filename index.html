@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Han Zhenni|视频剪辑师 &amp; 编导作品集</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Han Zhenni (韩贞泥) - 视频剪辑师 & 编导。专注于商业广告、爆款短视频及 AI 视觉流设计。">
+  <meta property="og:title" content="Han Zhenni | Video Editor & Director">
+  <meta property="og:image" content="images/preview-thumbnail.jpg">
+  <meta name="theme-color" content="#050505">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { night: '#050505', titanium: '#f5f5f5', accent: '#f5c543' },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Montserrat', 'Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 初始状态：透明且向下位移 */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 激活状态：回到原位 */
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 延迟类：让元素错开时间出现 */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+    ::selection { background: #f5c543; color: #050505; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #2b2b2b; border-radius: 999px; }
+
+    .noise-layer {
+      pointer-events: none; position: fixed; inset: 0; opacity: 0.16; z-index: 0;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
+    }
+
+    .btn-breath {
+      box-shadow: 0 0 0 0 rgba(245, 197, 67, 0.6);
+      animation: breath 2.4s ease-in-out infinite;
+    }
+
+    @keyframes breath {
+      0% { box-shadow: 0 0 0 0 rgba(245, 197, 67, 0.6); transform: scale(1); }
+      50% { box-shadow: 0 0 0 14px rgba(245, 197, 67, 0); transform: scale(1.03); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 197, 67, 0); transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      [data-tab-panel="shorts"], [data-tab-panel="ai"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+      }
+      #about-contact-section .flex-col.md\:flex-row { flex-direction: column !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-night text-titanium font-sans antialiased">
+  <div class="noise-layer"></div>
+
+  <div id="videoModal" class="fixed inset-0 z-[999] bg-black/95 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm">
+    <button onclick="closeModal()" class="absolute top-8 right-8 text-white/70 hover:text-white transition-all z-[1000] cursor-pointer p-4 bg-black/20 rounded-full backdrop-blur-md">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    
+    <div class="w-full max-w-6xl px-4 md:px-12 flex justify-center" onclick="event.stopPropagation()">
+      <video id="modalVideo" controls class="max-w-full max-h-[85vh] shadow-2xl rounded-sm" src=""></video>
+    </div>
+  </div>
+
+  <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+    <div class="absolute inset-0 z-0">
+      <video id="hero-video" autoplay muted loop playsinline class="w-full h-full object-cover">
+        <source src="hero.mp4.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-black/50 z-10"></div>
+    </div>
+    <div class="relative z-20 text-center px-6">
+      <h1 class="font-sans font-black uppercase inline-block transform scale-y-[1.8] origin-bottom tracking-tighter leading-[0.7] mb-20 bg-gradient-to-b from-accent via-accent to-transparent bg-clip-text text-transparent drop-shadow-[8px_12px_15px_rgba(0,0,0,0.7)] text-7xl md:text-9xl lg:text-[11rem]">
+        Portfolio
+      </h1>
+      <p class="text-accent tracking-[0.3em] uppercase text-sm md:text-lg mb-10">Senior Video Editor</p>
+      <div class="flex justify-center">
+        <a href="#work" class="px-12 py-4 bg-accent text-night font-bold uppercase tracking-[0.2em] hover:bg-white hover:scale-110 transition-all duration-300">View Work</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative w-full min-h-[70vh] bg-night py-32 flex items-center overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none z-0">
+      <div class="absolute inset-0 w-full h-full opacity-[0.18]">
+        <img src="images/timeline-bg.png.jpg" alt="Timeline" class="w-full h-full object-cover" style="mix-blend-mode: screen;">
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-transparent w-[60%]"></div>
+    </div>
+    <div class="relative z-10 w-full px-[5%] md:px-[10%]">
+      <div class="max-w-2xl text-left">
+        <p class="text-accent text-xs md:text-sm uppercase tracking-[0.4em] font-bold mb-6">剪辑 · 后期制作 · 短视频· 广告视频</p>
+        <h2 class="font-display font-black leading-none text-white text-5xl md:text-8xl uppercase mb-10 tracking-tighter">Han Zhenni</h2>
+        <p class="text-gray-300 text-base md:text-xl leading-relaxed mb-12">不做简单的画面堆砌。从拆解脚本到最后调色，我只关心一件事：如何用最干脆的剪辑点，把信息和情绪精准地呈现给观众。</p>
+        <button id="watch-showreel" class="btn-breath bg-accent text-night px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white transition-all">Watch Showreel</button>
+      </div>
+    </div>
+  </section>
+  <section class="py-8 bg-black">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-row justify-between items-center border-y border-white/5 py-4">
+        <div class="flex items-center gap-4">
+          <div class="w-8 h-[1px] bg-accent/50"></div> 
+          <h2 class="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.4em]">About Me</h2>
+        </div>
+        <div class="flex items-center gap-4">
+          <h3 class="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.4em]">Profile</h3>
+          <div class="w-8 h-[1px] bg-accent/50"></div> 
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="resume" class="py-24 bg-night text-white w-full border-t border-gray-900">
+    <div class="w-full px-[5%] md:px-[10%]">
+      <div class="flex flex-col lg:flex-row gap-20">
+        <div class="lg:w-[300px] flex-none group/sidebar">
+          <div class="relative w-40 h-40 overflow-hidden rounded-full border-2 border-accent/30 mb-8 mx-auto lg:mx-0 transition-all duration-700 group-hover/sidebar:border-accent group-hover/sidebar:shadow-[0_0_30px_rgba(212,175,55,0.2)]">
+            <img src="profile.jpg" alt="Profile" class="w-full h-full object-cover object-top transition-transform duration-1000 group-hover/sidebar:scale-110" onerror="this.src='profile.jpg.jpg'">
+          </div>
+          <h3 class="text-accent uppercase tracking-widest text-[10px] font-bold mb-4">/ Profile</h3>
+          <p class="text-white font-medium mb-4 italic transition-colors group-hover/sidebar:text-accent">嗨，我是韩贞泥，一位视频剪辑师/编导。</p>
+          <ul class="text-gray-400 text-sm space-y-3 mb-8">
+            <li class="hover:text-white transition-colors duration-300">● 高效执行：策划、拍摄、剪辑全流程。</li>
+            <li class="hover:text-white transition-colors duration-300">● 多场景适配：短视频、广告、文化纪实。</li>
+            <li class="hover:text-white transition-colors duration-300">● 技术扎实：精通后期软件与 AI 工作流。</li>
+          </ul>
+          <h3 class="text-accent uppercase tracking-widest text-[10px] font-bold mb-4">/ Contact</h3>
+          <div class="text-gray-400 text-sm font-mono space-y-1">
+            <p class="hover:text-accent transition-colors">Email: 1322844573@qq.com</p>
+            <p class="hover:text-accent transition-colors">Phone: 17383081289</p>
+            <p class="text-gray-600">Shenzhen, China</p>
+          </div>
+        </div>
+
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16">
+          <div>
+            <h2 class="text-xl font-display font-bold mb-8 text-white border-b border-gray-800 pb-2 uppercase italic tracking-tighter">Education</h2>
+            <div class="mb-12 group/edu p-4 -ml-4 rounded-lg hover:bg-white/5 transition-all duration-500">
+              <div class="flex justify-between items-end">
+                <p class="text-white font-bold text-sm group-hover/edu:text-accent transition-colors">四川美术学院</p>
+                <span class="text-gray-500 text-[10px] font-mono">2016.09 - 2020.07</span>
+              </div>
+              <p class="text-accent text-xs font-medium uppercase tracking-widest mt-1">影视动画编导 / 本科</p>
+              <p class="text-gray-400 text-[11px] mt-2 leading-relaxed">主修课程：影视导演基础、影视短片创作、影视剪辑技术、影视包装设计。</p>
+            </div>
+
+            <h2 class="text-xl font-display font-bold mb-8 text-white border-b border-gray-800 pb-2 uppercase italic tracking-tighter">Experience</h2>
+            <div class="space-y-8">
+              <div class="pl-4 border-l border-accent/30 hover:border-accent hover:bg-white/5 p-4 -ml-[17px] transition-all duration-500 group/exp">
+                <div class="flex justify-between">
+                  <p class="text-white font-bold text-sm group-hover/exp:text-accent transition-colors">思维巡航网络技术有限公司</p>
+                  <span class="text-gray-500 text-[10px] font-mono whitespace-nowrap">2025.08 - 至今</span>
+                </div>
+                <p class="text-accent text-[10px] font-bold uppercase mt-1">剪辑师 (Freelance)</p>
+                <p class="text-gray-400 text-[11px] mt-2">负责TK/YouTube/Google海外推广视频。月均产出 50+ 高质量内容。</p>
+              </div>
+              <div class="pl-4 border-l border-accent/30 hover:border-accent hover:bg-white/5 p-4 -ml-[17px] transition-all duration-500 group/exp">
+                <div class="flex justify-between">
+                  <p class="text-white font-bold text-sm group-hover/exp:text-accent transition-colors">深圳伊缪科技有限公司</p>
+                  <span class="text-gray-500 text-[10px] font-mono whitespace-nowrap">2022.05 - 2025.08</span>
+                </div>
+                <p class="text-accent text-[10px] font-bold uppercase mt-1">剪辑师 (全职 + 远程兼职)</p>
+                <ul class="text-gray-400 text-[11px] space-y-1 mt-2">
+                  <li class="group-hover/exp:text-gray-300 transition-colors">● 推动产品单月 GMV 提升 18%。</li>
+                  <li class="group-hover/exp:text-gray-300 transition-colors">● 累计产出视频近 5000 个；ROI 稳定 2+。</li>
+                </ul>
+              </div>
+              <div class="pl-4 border-l border-accent/30 hover:border-accent hover:bg-white/5 p-4 -ml-[17px] transition-all duration-500 group/exp">
+                <div class="flex justify-between">
+                  <p class="text-white font-bold text-sm group-hover/exp:text-accent transition-colors">深圳紫砖贸易有限公司</p>
+                  <span class="text-gray-500 text-[10px] font-mono whitespace-nowrap">2021.01 - 2022.05</span>
+                </div>
+                <p class="text-accent text-[10px] font-bold uppercase mt-1">摄影师 / 剪辑师</p>
+                <p class="text-gray-400 text-[11px] mt-2">创作 1000+ 视频。助力涨粉 9w+，累计播放千万。</p>
+              </div>
+              <div class="pl-4 border-l border-gray-800 hover:border-accent/50 hover:bg-white/5 p-4 -ml-[17px] transition-all duration-500 group/exp">
+                <div class="flex justify-between">
+                  <p class="text-white font-bold text-sm group-hover/exp:text-accent transition-colors">深圳腾讯计算机系统有限公司</p>
+                  <span class="text-gray-500 text-[10px] font-mono whitespace-nowrap">2020.07 - 2020.12</span>
+                </div>
+                <p class="text-accent text-[10px] font-bold uppercase mt-1">社群运营</p>
+                <p class="text-gray-400 text-[11px] mt-2">推动付费转化率至 60%；裂变参与率 90%。</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-display font-bold mb-8 text-white border-b border-gray-800 pb-2 uppercase italic tracking-tighter">Technical Skills</h2>
+            <div class="flex flex-wrap gap-5 mb-16">
+              <div class="flex flex-col items-center gap-1 group/s">
+                <div class="w-12 h-12 rounded-lg border border-white/10 overflow-hidden transition-all duration-500 group-hover/s:-translate-y-2 group-hover/s:border-accent/50 group-hover/s:shadow-[0_10px_20px_rgba(212,175,55,0.1)]">
+                  <img src="pr.png.png" class="w-full h-full object-cover">
+                </div>
+                <span class="text-[9px] text-gray-500 group-hover/s:text-accent transition-colors">PR</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 group/s">
+                <div class="w-12 h-12 rounded-lg border border-white/10 overflow-hidden transition-all duration-500 group-hover/s:-translate-y-2 group-hover/s:border-accent/50 group-hover/s:shadow-[0_10px_20px_rgba(212,175,55,0.1)]">
+                  <img src="ae.png.jpg" class="w-full h-full object-cover">
+                </div>
+                <span class="text-[9px] text-gray-500 group-hover/s:text-accent transition-colors">AE</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 group/s">
+                <div class="w-12 h-12 rounded-lg border border-white/10 overflow-hidden transition-all duration-500 group-hover/s:-translate-y-2 group-hover/s:border-accent/50 group-hover/s:shadow-[0_10px_20px_rgba(212,175,55,0.1)]">
+                  <img src="dv.png (达芬奇).png" class="w-full h-full object-cover">
+                </div>
+                <span class="text-[9px] text-gray-500 group-hover/s:text-accent transition-colors">DaVinci</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 group/s">
+                <div class="w-12 h-12 rounded-lg border border-white/10 overflow-hidden transition-all duration-500 group-hover/s:-translate-y-2 group-hover/s:border-accent/50 group-hover/s:shadow-[0_10px_20px_rgba(212,175,55,0.1)]">
+                  <img src="ps.png.png" class="w-full h-full object-cover">
+                </div>
+                <span class="text-[9px] text-gray-500 group-hover/s:text-accent transition-colors">PS</span>
+              </div>
+              <div class="flex flex-col items-center gap-1 group/s">
+                <div class="w-12 h-12 rounded-lg border border-white/10 overflow-hidden transition-all duration-500 group-hover/s:-translate-y-2 group-hover/s:border-accent/50 group-hover/s:shadow-[0_10px_20px_rgba(212,175,55,0.1)]">
+                  <img src="jy.png (剪映).png" class="w-full h-full object-cover">
+                </div>
+                <span class="text-[9px] text-gray-500 group-hover/s:text-accent transition-colors">剪映</span>
+              </div>
+            </div>
+
+            <h2 class="text-xl font-display font-bold mb-8 text-white border-b border-gray-800 pb-2 uppercase italic tracking-tighter">Interests</h2>
+            <div class="p-6 bg-white/5 rounded-xl border border-white/5 hover:border-accent/20 transition-all duration-700">
+               <p class="text-gray-400 text-xs italic leading-relaxed hover:text-gray-300 transition-colors">
+                摄影、运动健身、电影。保持对生活的好奇心，是创作的第一动力。
+               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> <section class="py-8 bg-black">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-row justify-between items-center border-y border-white/5 py-4">
+        <div class="flex items-center gap-4">
+          <div class="w-8 h-[1px] bg-accent/50"></div> 
+          <h2 class="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.4em]">Video Editing</h2>
+        </div>
+        <div class="flex items-center gap-4">
+          <h3 class="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.4em]">My Works</h3>
+          <div class="w-8 h-[1px] bg-accent/50"></div> 
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="work" class="py-24 bg-night text-white w-full border-t border-gray-900/30">
+    <div class="w-full px-[5%] md:px-[10%]">
+      
+      <div class="flex flex-col lg:flex-row items-start justify-between gap-8 mb-16">
+        <div class="lg:w-1/2">
+          <p class="text-xs uppercase tracking-[0.24em] text-gray-500 mb-4">Portfolio</p>
+          <h2 class="font-display text-3xl md:text-5xl tracking-tight uppercase italic text-accent">广告 · 短视频 · AIGC</h2>
+        </div>
+        <p class="lg:w-1/3 text-sm text-gray-400 leading-relaxed italic">
+          “从脚本逻辑拆解、动态节奏把控到 后期动效结合的全流程交付能力”。
+        </p>
+      </div>
+
+      <div class="mb-12 border-b border-gray-800 flex flex-wrap gap-3 pb-2 relative z-50">
+        <button class="tab-trigger rounded-sm px-4 py-2 text-xs md:text-sm tracking-widest uppercase border border-transparent text-gray-400 data-[active=true]:bg-accent data-[active=true]:text-night transition-all" data-tab-target="ads">广告视频</button>
+        <button class="tab-trigger rounded-sm px-4 py-2 text-xs md:text-sm tracking-widest uppercase border border-transparent text-gray-400 data-[active=true]:bg-accent data-[active=true]:text-night transition-all" data-tab-target="shorts">短视频</button>
+      </div>
+
+      <div class="tab-panel grid grid-cols-1 md:grid-cols-3 gap-8" data-tab-panel="ads">
+        <article onclick="openVideo('videos/ad-01-finance.mp4.mp4')" class="group relative aspect-video overflow-hidden bg-gray-900 cursor-pointer border border-white/5">
+          <video class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-70" 
+                 muted playsinline 
+                 poster="images/poster-ad-01-finance.jpg.jpg">
+            <source src="videos/ad-01-finance.mp4.mp4" type="video/mp4">
+          </video>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-5 flex items-end pointer-events-none">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-accent">01 / Google/Facebook投放广告</p>
+          </div>
+        </article>
+      
+        <article onclick="openVideo('videos/ad-02-tech.mp4.mp4')" class="group relative aspect-video overflow-hidden bg-gray-900 cursor-pointer border border-white/5">
+          <video class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-70" 
+                 muted playsinline 
+                 poster="images/poster-ad-02-tech.jpg.jpg">
+            <source src="videos/ad-02-tech.mp4.mp4" type="video/mp4">
+          </video>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-5 flex items-end pointer-events-none">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-accent">02 / Google/Facebook投放广告</p>
+          </div>
+        </article>
+      
+        <article onclick="openVideo('videos/ad-03-lifestyle.mp4.mp4')" class="group relative aspect-video overflow-hidden bg-gray-900 cursor-pointer border border-white/5">
+          <video class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-70" 
+                 muted playsinline 
+                 poster="images/poster-ad-03-lifestyle.jpg.jpg">
+            <source src="videos/ad-03-lifestyle.mp4.mp4" type="video/mp4">
+          </video>
+          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 p-5 flex items-end pointer-events-none">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-accent">03 / Google/Facebook投放广告</p>
+          </div>
+        </article>
+      </div>
+
+        <div class="tab-panel hidden grid grid-cols-2 lg:grid-cols-4 gap-4" data-tab-panel="shorts">
+          <article class="group relative aspect-[9/16] overflow-hidden bg-gray-900 cursor-pointer border border-gray-800">
+            <video class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" muted loop playsinline preload="metadata" poster="images/poster-short-01.jpg.jpg" onmouseover="this.play()" onmouseout="this.pause()">
+              <source src="videos/short-01.mp4.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 text-[10px]">TikTok 短视频 #01</div>
+          </article>
+          <article class="group relative aspect-[9/16] overflow-hidden bg-gray-900 cursor-pointer border border-gray-800">
+            <video class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" muted loop playsinline preload="metadata" poster="images/poster-short-02.jpg.jpg" onmouseover="this.play()" onmouseout="this.pause()">
+              <source src="videos/short-02.mp4.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 text-[10px]">TikTok 短视频 #02</div>
+          </article>
+          <article class="group relative aspect-[9/16] overflow-hidden bg-gray-900 cursor-pointer border border-gray-800">
+            <video class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" muted loop playsinline preload="metadata" poster="images/poster-short-03.jpg.jpg" onmouseover="this.play()" onmouseout="this.pause()">
+              <source src="videos/short-03.mp4.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 text-[10px]">TikTok 短视频 #03</div>
+          </article>
+          <article class="group relative aspect-[9/16] overflow-hidden bg-gray-900 cursor-pointer border border-gray-800">
+            <video class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" muted loop playsinline preload="metadata" poster="images/poster-short-04.jpg.jpg" onmouseover="this.play()" onmouseout="this.pause()">
+              <source src="videos/short-04.mp4.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 text-[10px]">TikTok 短视频 #04</div>
+          </article>
+        </div>
+
+        <div class="tab-panel hidden grid grid-cols-2 lg:grid-cols-4 gap-4" data-tab-panel="ai">
+          <article class="group relative aspect-[9/16] overflow-hidden bg-gray-900 cursor-pointer border border-gray-800">
+            <video class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" muted loop playsinline preload="metadata" poster="images/poster-ai-01.jpg.jpg" onmouseover="this.play()" onmouseout="this.pause()">
+              <source src="videos/videos-ai-01.mp4.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 text-[10px]">AI 视觉探索 #01</div>
+          </article>
+        </div>
+
+    <section id="ai-special" class="py-24 bg-black border-t border-gray-900/50">
+      <div class="w-full px-[5%] md:px-[10%]">
+        <div class="flex items-center gap-4 mb-20">
+          <div class="w-12 h-[1px] bg-accent"></div>
+          <h2 class="text-white text-2xl md:text-4xl font-display font-bold italic uppercase tracking-tighter">
+            AI <span class="text-accent">Visual</span> Production
+          </h2>
+        </div>
+    
+        <div class="space-y-32">
+          <div class="flex flex-col items-center group">
+            <article onclick="openVideo('videos/ai-916.mp4.mp4')" class="w-full max-w-[400px] aspect-[9/16] bg-gray-900 border border-white/5 relative overflow-hidden cursor-pointer">
+              <video 
+                class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-70" 
+                muted playsinline 
+                poster="images/poster-ai-916.jpg.jpg">
+                <source src="videos/ai-916.mp4.mp4" type="video/mp4">
+              </video>
+              <div class="absolute top-4 left-4 text-[10px] text-accent font-mono pointer-events-none">TYPE: VERTICAL_NARRATIVE</div>
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            </article>
+            <div class="mt-6 text-center">
+              <h3 class="text-xl text-white font-bold italic uppercase">AIGC 香水商业广告</h3>
+            </div>
+          </div>
+    
+          <div class="flex flex-col items-center group">
+            <article onclick="openVideo('videos/ai-169.mp4.mp4')" class="w-full max-w-[1000px] aspect-video bg-gray-900 border border-white/5 relative overflow-hidden cursor-pointer">
+              <video 
+                class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-70" 
+                muted playsinline 
+                poster="images/poster-ai-169.jpg.jpg">
+                <source src="videos/ai-169.mp4.mp4" type="video/mp4">
+              </video>
+              <div class="absolute top-4 left-4 text-[10px] text-accent font-mono pointer-events-none">TYPE: CINEMATIC_WIDE</div>
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            </article>
+            <div class="mt-6 text-center">
+              <h3 class="text-xl text-white font-bold italic uppercase">AIGC 汽车视觉概念广告</h3>
+            </div>
+          </div>
+    
+          <div class="flex flex-col items-center group">
+            <article onclick="openVideo('videos/ai-11.mp4.mp4')" class="w-full max-w-[600px] aspect-square bg-gray-900 border border-white/5 relative overflow-hidden cursor-pointer">
+              <video 
+                class="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-70" 
+                muted playsinline 
+                poster="images/poster-ai-11.jpg.jpg">
+                <source src="videos/ai-11.mp4.mp4" type="video/mp4">
+              </video>
+              <div class="absolute top-4 left-4 text-[10px] text-accent font-mono pointer-events-none">TYPE: SQUARE_SOCIAL_ADS</div>
+              <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            </article>
+            <div class="mt-6 text-center">
+              <h3 class="text-xl text-white font-bold italic uppercase">AIGC 眼镜商业广告</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="py-8 bg-black">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-row justify-between items-center border-y border-white/5 py-4">
+          <div class="flex items-center gap-4">
+            <div class="w-8 h-[1px] bg-accent/50"></div> 
+            <h2 class="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.4em]">Creative Tech</h2>
+          </div>
+          <div class="flex items-center gap-4">
+            <h3 class="text-accent text-xs md:text-sm font-bold uppercase tracking-[0.4em]">Workflow Pipeline</h3>
+            <div class="w-8 h-[1px] bg-accent/50"></div> 
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="py-24 bg-night border-t border-gray-900/50">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-16 items-start">
+          
+          <div class="lg:w-4/12 space-y-8">
+            <div>
+              <div class="flex items-center gap-3 mb-4">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+                </span>
+                <p class="text-accent text-xs uppercase tracking-[0.4em] font-bold">全AI制作</p>
+              </div>
+              <h2 class="text-4xl md:text-5xl font-display font-black text-white italic tracking-tighter uppercase leading-[0.9]">
+                AI Driven<br>Production
+              </h2>
+            </div>
+    
+            <p class="text-gray-300 text-sm leading-relaxed">
+              从前期的Idea到最后的落地。我用 AI 工作流进行极速的概念落地和动态分镜尝试，结合成熟的后期剪辑，实现商业级的交付标准。
+            </p>
+    
+            <div class="space-y-6 pt-4">
+              <div class="border-l-2 border-accent/30 pl-4">
+                <h4 class="text-white text-xs font-bold uppercase tracking-widest">01. 概念视觉</h4>
+                <p class="text-gray-500 text-[11px] mt-1">Midjourney & Nano banana训练特定美学风格，确立整体风格与调性。</p>
+              </div>
+              <div class="border-l-2 border-accent/30 pl-4">
+                <h4 class="text-white text-xs font-bold uppercase tracking-widest">02. 动态演绎</h4>
+                <p class="text-gray-500 text-[11px] mt-1">即梦 & kling & 海螺，实现动态分镜，完成高拟真商业镜头生成。</p>
+              </div>
+              <div class="border-l-2 border-accent/30 pl-4">
+                <h4 class="text-white text-xs font-bold uppercase tracking-widest">03. 后期合成</h4>
+                <p class="text-gray-500 text-[11px] mt-1">剪映 & Dvinci & elevenlabs深度后期，确保音画节奏与品牌逻辑契合。</p>
+              </div>
+            </div>
+          </div>
+          
+    
+          <div class="lg:w-7/12 w-full relative group">
+            <div class="absolute -inset-4 bg-accent/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition duration-1000"></div>
+            
+            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-gray-900/50 border border-white/5 p-4 rounded-sm transition-all duration-500 hover:border-accent/30">
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-[9px] text-gray-500 font-mono italic">MJ_Vision_Core.cfg</span>
+                  <span class="text-[9px] text-accent font-mono uppercase tracking-tighter">Visual Set</span>
+                </div>
+                <div class="aspect-video bg-black/60 overflow-hidden rounded-sm border border-white/5">
+                   <img src="images/ai-concept.jpg.png" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700">
+                </div>
+              </div>
+          
+              <div class="bg-gray-900/50 border border-white/5 p-4 rounded-sm transition-all duration-500 hover:border-accent/30">
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-[9px] text-gray-500 font-mono italic">Motion_Control.sh</span>
+                  <span class="text-[9px] text-accent font-mono uppercase animate-pulse">Processing</span>
+                </div>
+                <div class="aspect-video bg-black/60 overflow-hidden rounded-sm border border-white/5">
+                   <img src="images/workflow-preview.jpg.jpg" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700">
+                </div>
+              </div>
+            </div>
+          
+            <div class="relative mt-4 bg-gray-900/50 border border-white/5 p-4 rounded-sm transition-all duration-500 hover:border-accent/30">
+              <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] text-gray-400 font-mono">Final_Compositing.aep</span>
+                  <span class="px-1.5 py-0.5 bg-accent/10 text-accent text-[8px] rounded-xs uppercase tracking-tighter">Timeline</span>
+                </div>
+                <div class="flex gap-3">
+                  <span class="text-[9px] text-white/30 font-mono italic tracking-tighter">POST_PRODUCTION_PHASE</span>
+                </div>
+              </div>
+              
+              <div class="h-28 w-full bg-black/40 relative overflow-hidden rounded-xs border border-white/5">
+                 <img src="images/ae-timeline.jpg.jpg" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-all duration-700">
+                 
+                 <div class="absolute inset-y-0 left-1/3 w-[1px] bg-red-500 z-10 shadow-[0_0_8px_rgba(239,68,68,0.8)] pointer-events-none"></div>
+                 
+                 <p class="absolute bottom-1 right-2 text-[7px] text-gray-400 font-mono uppercase bg-black/40 px-1">Layers Active</p>
+              </div>
+            </div>
+          </div>
+    
+        </div> 
+    
+        <div class="mt-20 pt-12 border-t border-white/5 w-full">
+          <div class="max-w-6xl mx-auto flex flex-col items-center gap-10">
+            <p class="text-[10px] uppercase tracking-[0.5em] text-gray-500 font-mono">AI Technical Stack</p>
+            
+            <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
+              
+              <img src="images/logo-mj.png" 
+                   class="h-12 md:h-14 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+                   title="Midjourney">
+               
+              <img src="images/logo-nano.png" 
+                   class="h-12 md:h-14 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+                   title="Nano banana">     
+
+              <img src="images/logo-jimeng.png" 
+                   class="h-12 md:h-14 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+                   title="即梦 AI">
+                   
+              <img src="images/logo-kling.png" 
+                   class="h-12 md:h-14 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+                   title="Kling AI">
+                   
+              <img src="images/logo-hailuo.png" 
+                   class="h-11 md:h-13 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+                   title="海螺AI">
+                   
+              <img src="images/logo-labs.png" 
+                   class="h-11 md:h-13 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+                   title="ElevenLabs">
+                   
+            </div>
+          </div>
+        </div>
+
+    </div> </section>
+
+<section id="about-contact-section" class="py-24 px-6 md:px-10 border-t border-gray-900/80 bg-black/40">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-16 items-start">
+    <div class="md:w-2/3 space-y-6">
+      <p class="text-xs uppercase tracking-widest text-gray-500"></p>
+      <h3 class="font-display text-2xl md:text-3xl text-white">将视觉风格转化为品牌增长的有效工具</h3>
+      <p class="text-gray-400 max-w-xl">专注于商业广告、爆款短视频及 AI 视觉流设计。支持远程协作，让每一帧都产生价值。</p>
+    </div>
+    <div class="md:w-1/3 flex flex-col items-center md:items-end w-full">
+      <p class="text-xs uppercase tracking-widest text-gray-500 mb-4">Connect Me WeChat</p>
+      <div class="relative group">
+        <div class="absolute -inset-2 border border-accent/10 group-hover:border-accent/30 transition-all"></div>
+        <img src="images/your-wechat-qr.jpg.jpg" alt="WeChat QR" class="w-32 h-32 md:w-40 md:h-40 grayscale hover:grayscale-0 transition-all opacity-80 group-hover:opacity-100">
+      </div>
+      <p class="text-[10px] text-gray-600 mt-4 tracking-tighter">SCAN TO START A PROJECT</p>
+    </div>
+  </div>
+</section>
+
+  <footer class="bg-black py-16 text-center border-t border-gray-900">
+    <p class="text-gray-500 text-xs tracking-widest uppercase">© 2026 Han Zhenni — 视频剪辑师 & 编导. All Rights Reserved.</p>
+    <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="mt-8 text-[10px] text-gray-800 hover:text-gray-400 uppercase tracking-[0.4em]">Back to top ↑</button>
+  </footer>
+
+  <script>
+    const modal = document.getElementById('videoModal');
+    const modalVideo = document.getElementById('modalVideo');
+
+    function openVideo(src) {
+      modalVideo.src = src;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => modal.classList.add('opacity-100'), 10);
+      modalVideo.play();
+    }
+
+    function closeModal() {
+      modal.classList.remove('opacity-100');
+      document.body.style.overflow = '';
+      setTimeout(() => { modal.classList.add('hidden'); modalVideo.pause(); modalVideo.src = ""; }, 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('article').forEach(a => a.addEventListener('click', function() {
+        const src = this.querySelector('source').getAttribute('src');
+        openVideo(src);
+      }));
+
+      const triggers = document.querySelectorAll('.tab-trigger');
+      const panels = document.querySelectorAll('.tab-panel');
+      function activateTab(t) {
+        triggers.forEach(b => b.dataset.active = b.dataset.tabTarget === t ? 'true' : 'false');
+        panels.forEach(p => p.classList.toggle('hidden', p.dataset.tabPanel !== t));
+      }
+      triggers.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tabTarget)));
+      if(triggers.length) activateTab(triggers[0].dataset.tabTarget);
+
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+      // Showreel
+      const heroVideo = document.getElementById('hero-video');
+      document.getElementById('watch-showreel').addEventListener('click', () => {
+        heroVideo.muted = false;
+        const req = heroVideo.requestFullscreen || heroVideo.webkitRequestFullscreen;
+        if (req) req.call(heroVideo);
+        heroVideo.play();
+      });
+    });
+  </script>
+</body>
+</html>
