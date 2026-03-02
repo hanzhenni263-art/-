@@ -97,38 +97,51 @@
 
   <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
     <div class="absolute inset-0 z-0">
-      <video id="hero-video" autoplay muted loop playsinline class="w-full h-full object-cover">
+      <video id="hero-video" autoplay muted loop playsinline webkit-playsinline class="w-full h-full object-cover">
         <source src="hero.mp4.mp4" type="video/mp4">
       </video>
       <div class="absolute inset-0 bg-black/50 z-10"></div>
     </div>
+
     <div class="relative z-20 text-center px-6">
       <h1 class="font-sans font-black uppercase inline-block transform scale-y-[1.8] origin-bottom tracking-tighter leading-[0.7] mb-20 bg-gradient-to-b from-accent via-accent to-transparent bg-clip-text text-transparent drop-shadow-[8px_12px_15px_rgba(0,0,0,0.7)] text-7xl md:text-9xl lg:text-[11rem]">
-        Portfolio
+        PORTFOLIO
       </h1>
-      <p class="text-accent tracking-[0.3em] uppercase text-sm md:text-lg mb-10">Senior Video Editor</p>
-      <div class="flex justify-center">
-        <a href="#work" class="px-12 py-4 bg-accent text-night font-bold uppercase tracking-[0.2em] hover:bg-white hover:scale-110 transition-all duration-300">View Work</a>
+      
+      <div class="mt-8">
+        <button onclick="openModal('hero.mp4.mp4')" class="px-8 py-4 bg-accent text-black font-bold uppercase tracking-widest hover:bg-white transition-all duration-300">
+          Watch Showreel
+        </button>
       </div>
     </div>
-  </section>
+</section>
 
-  <section class="relative w-full min-h-[70vh] bg-night py-32 flex items-center overflow-hidden">
+<section class="relative w-full min-h-[70vh] bg-night py-32 flex items-center overflow-hidden">
     <div class="absolute inset-0 pointer-events-none z-0">
       <div class="absolute inset-0 w-full h-full opacity-[0.18]">
         <img src="images/timeline-bg.png.jpg" alt="Timeline" class="w-full h-full object-cover" style="mix-blend-mode: screen;">
       </div>
       <div class="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-transparent w-[60%]"></div>
     </div>
+
     <div class="relative z-10 w-full px-[5%] md:px-[10%]">
       <div class="max-w-2xl text-left">
-        <p class="text-accent text-xs md:text-sm uppercase tracking-[0.4em] font-bold mb-6">剪辑 · 后期制作 · 短视频· 广告视频</p>
-        <h2 class="font-display font-black leading-none text-white text-5xl md:text-8xl uppercase mb-10 tracking-tighter">Han Zhenni</h2>
-        <p class="text-gray-300 text-base md:text-xl leading-relaxed mb-12">不做简单的画面堆砌。从拆解脚本到最后调色，我只关心一件事：如何用最干脆的剪辑点，把信息和情绪精准地呈现给观众。</p>
-        <button id="watch-showreel" class="btn-breath bg-accent text-night px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white transition-all">Watch Showreel</button>
+        <p class="text-accent text-xs md:text-sm uppercase tracking-[0.4em] font-bold mb-6">剪辑 · 后期制作 · 短视频 · 广告视频</p>
+        <h2 class="font-display font-black leading-none text-white text-5xl md:text-8xl uppercase mb-6 tracking-tighter">Han Zhenni</h2>
+        <p class="text-accent tracking-[0.3em] uppercase text-sm md:text-lg mb-8">Senior Video Editor</p>
+        
+        <p class="text-gray-300 text-base md:text-xl leading-relaxed mb-12">
+          不做简单的画面堆砌。从拆解脚本到最后调色，我只关心一件事：如何用最干脆的剪辑点，把信息和情绪精准地呈现给观众。
+        </p>
+
+        <div class="flex justify-start">
+          <a href="#work" class="px-12 py-4 bg-accent text-night font-bold uppercase tracking-[0.2em] hover:bg-white hover:scale-110 transition-all duration-300">
+            View Work
+          </a>
+        </div>
       </div>
     </div>
-  </section>
+</section>
   <section class="py-8 bg-black">
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex flex-row justify-between items-center border-y border-white/5 py-4">
@@ -632,5 +645,56 @@
       });
     });
   </script>
+<div id="videoModal" class="fixed inset-0 z-[999] hidden bg-black/95 flex items-center justify-center p-4">
+  <button onclick="closeModal()" class="absolute top-8 right-8 text-white text-5xl z-[1000]">&times;</button>
+  <div class="w-full max-w-5xl aspect-video">
+      <video id="modalVideo" controls playsinline class="w-full h-full">
+          <source src="hero.mp4.mp4" type="video/mp4">
+      </video>
+  </div>
+</div>
+
+<script>
+  // 确保函数在最外层，按钮才找得到
+  function openModal(videoSrc) {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('modalVideo');
+    
+    if (modal && video) {
+      // 1. 设置视频地址
+      video.src = videoSrc;
+      // 2. 显示弹窗（移除 hidden）
+      modal.classList.remove('hidden');
+      // 3. 处理透明度动画
+      setTimeout(() => {
+        modal.classList.add('opacity-100');
+      }, 20);
+      // 4. 播放视频
+      video.play();
+    }
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('modalVideo');
+    
+    if (modal && video) {
+      // 1. 先淡出动画
+      modal.classList.remove('opacity-100');
+      // 2. 动画结束后隐藏并停止
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        video.pause();
+        video.currentTime = 0;
+        video.src = ""; // 清空地址，防止后台继续加载
+      }, 300);
+    }
+  }
+
+  // 点击背景也能关
+  document.getElementById('videoModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
 </body>
 </html>
