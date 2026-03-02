@@ -91,7 +91,7 @@
     </button>
     
     <div class="w-full max-w-6xl px-4 md:px-12 flex justify-center" onclick="event.stopPropagation()">
-      <video id="modalVideo" controls class="max-w-full max-h-[85vh] shadow-2xl rounded-sm" src=""></video>
+      <video id="modalVideo" preload="none" controls playsinline class="max-w-full max-h-[85vh] shadow-2xl rounded-sm"></video>
     </div>
   </div>
 
@@ -661,15 +661,16 @@
     const video = document.getElementById('modalVideo');
     
     if (modal && video) {
-      // 1. 设置视频地址
       video.src = videoSrc;
-      // 2. 显示弹窗（移除 hidden）
       modal.classList.remove('hidden');
-      // 3. 处理透明度动画
+      
+      // --- 关键修复：打开时禁止背景滚动 ---
+      document.body.style.overflow = 'hidden';
+      // -------------------------------
+
       setTimeout(() => {
         modal.classList.add('opacity-100');
       }, 20);
-      // 4. 播放视频
       video.play();
     }
   }
@@ -679,14 +680,17 @@
     const video = document.getElementById('modalVideo');
     
     if (modal && video) {
-      // 1. 先淡出动画
       modal.classList.remove('opacity-100');
-      // 2. 动画结束后隐藏并停止
+      
+      // --- 关键修复：恢复滚动 ---
+      document.body.style.overflow = ''; 
+      // -----------------------
+
       setTimeout(() => {
         modal.classList.add('hidden');
         video.pause();
         video.currentTime = 0;
-        video.src = ""; // 清空地址，防止后台继续加载
+        video.src = ""; 
       }, 300);
     }
   }
